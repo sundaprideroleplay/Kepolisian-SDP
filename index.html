@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLISI SUNDAPRIDE MANAGEMENT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #020617;
+            --sidebar-bg: rgba(7, 26, 43, 0.95);
+            --accent: #3b82f6;
+            --blue-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            --white: #ffffff;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #f1f5f9; min-height: 100vh; overflow-x: hidden; color: var(--text-main); }
+
+        /* BACKDROP UI TETAP SAMA */
+        .ocean-backdrop {
+            --ocean-deep: #0b3a57; --ocean: #0f4e72;
+            position: fixed; inset: 0;
+            background: linear-gradient(180deg, var(--ocean) 75%, var(--ocean-deep) 100%);
+            z-index: -2; transition: filter 0.8s ease;
+        }
+
+        .island-backdrop {
+            filter: url(#handDrawnNoise);
+            --ocean-deep: #194f71; --ocean: #216a94;
+            --sand: #f6e7b4; --land: #93c66b; --land-dark: #79ab4f;
+            position: absolute; inset: 0;
+            background-image: 
+                radial-gradient(ellipse 8vmin 10vmin at 20% 25%, var(--land-dark) 0 70%, transparent 71%),
+                radial-gradient(ellipse 16vmin 12vmin at 20% 25%, var(--land) 0 70%, transparent 71%),
+                radial-gradient(ellipse 20vmin 16vmin at 20% 25%, var(--sand) 0 70%, transparent 71%),
+                radial-gradient(ellipse 6vmin 11vmin at 75% 30%, var(--land-dark) 0 70%, transparent 71%),
+                radial-gradient(ellipse 17vmin 13vmin at 75% 30%, var(--land) 0 70%, transparent 71%),
+                radial-gradient(ellipse 21vmin 17vmin at 75% 30%, var(--sand) 0 70%, transparent 71%),
+                radial-gradient(ellipse 15vmin 12vmin at 50% 75%, var(--land) 0 70%, transparent 71%),
+                radial-gradient(ellipse 19vmin 16vmin at 50% 75%, var(--sand) 0 70%, transparent 71%),
+                linear-gradient(180deg, var(--ocean) 0%, var(--ocean-deep) 80%);
+        }
+
+        body.logged-in .ocean-backdrop { filter: blur(25px) brightness(0.35); }
+
+        /* SIDEBAR & MAIN CONTENT TETAP SAMA */
+        .sidebar { 
+            width: 300px; background: var(--sidebar-bg); backdrop-filter: blur(25px); 
+            color: white; position: fixed; height: calc(100vh - 40px); margin: 20px; 
+            border-radius: 32px; padding: 40px 20px; z-index: 100; 
+            border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .main-content { margin-left: 340px; padding: 40px; width: calc(100% - 340px); min-height: 100vh; }
+
+        .logo-login { width: 160px; margin-bottom: 25px; filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6)); }
+        .logo-sidebar { width: 120px; margin-bottom: 15px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
+
+        .card { 
+            background: var(--glass-bg); backdrop-filter: blur(12px); padding: 30px; 
+            border-radius: 28px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.7); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); transition: transform 0.3s ease;
+        }
+
+        .nav-item { padding: 16px 20px; cursor: pointer; border-radius: 18px; margin-bottom: 10px; transition: 0.3s ease; display: flex; align-items: center; gap: 14px; color: #94a3b8; font-weight: 600; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: var(--blue-gradient); color: white; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4); }
+
+        .btn { padding: 14px 24px; border: none; border-radius: 16px; cursor: pointer; font-weight: 700; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; }
+        .btn-blue { background: var(--blue-gradient); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+
+        input, select, textarea { width: 100%; padding: 16px 20px; border-radius: 16px; border: 2px solid #e2e8f0; margin-bottom: 18px; outline: none; background: #fff; transition: border-color 0.3s; font-size: 1rem; }
+        
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; min-width: 700px; }
+        th { text-align: left; padding: 15px 20px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; }
+        td { padding: 20px; background: white; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+        td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 20px; border-bottom-left-radius: 20px; }
+        td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 20px; border-bottom-right-radius: 20px; }
+
+        .badge { padding: 7px 14px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body id="main-body">
+
+    <div class="ocean-backdrop"><div class="island-backdrop"></div></div>
+    <svg height="0" width="0" style="position: absolute;"><filter id="handDrawnNoise"><feTurbulence result="noise" numOctaves="5" baseFrequency="0.0065" type="fractalNoise"></feTurbulence><feDisplacementMap yChannelSelector="G" xChannelSelector="R" scale="900" in2="noise" in="SourceGraphic"></feDisplacementMap></filter></svg>
+
+    <section id="login-section" style="height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: rgba(2, 6, 23, 0.5); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); padding: 60px 45px; border-radius: 45px; width: 100%; max-width: 480px; text-align: center; color: white; box-shadow: 0 30px 60px rgba(0,0,0,0.4);">
+            <img src="logopolissdp2.png" class="logo-login" alt="Logo">
+            <h1 style="letter-spacing: 5px; font-weight: 900; font-size: 2rem; margin-bottom: 8px;">POLISI SUNDAPRIDE</h1>
+            <p style="color: #94a3b8; font-weight: 500; margin-bottom: 40px; font-size: 0.9rem;">LOGIN SYSTEM</p>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="NIP Anggota" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                <input type="password" id="password" placeholder="Passcode" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                <button type="submit" class="btn btn-blue" style="width: 100%; height: 60px; font-size: 1.1rem; letter-spacing: 2px;">AUTHENTICATION</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="dashboard-section" style="display: none;">
+        <aside class="sidebar">
+            <div style="text-align: center; margin-bottom: 45px; width: 100%;">
+                <img src="logopolissdp2.png" class="logo-sidebar">
+                <h3 id="user-name-sidebar" style="font-size: 1.1rem; margin-top: 10px;">Nama</h3>
+                <p id="user-rank-sidebar" style="color: var(--accent); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"></p>
+            </div>
+            <nav style="flex:1">
+                <div id="nav-home" onclick="showPage('home')" class="nav-item active">📊 <span>Dashboard</span></div>
+                <div id="user-tools">
+                    <div id="nav-submission" onclick="showPage('submission')" class="nav-item">📝 <span>Pengajuan Surat</span></div>
+                </div>
+                <div id="admin-tools" style="display:none;">
+                    <div id="nav-inbox" onclick="showPage('inbox')" class="nav-item">📥 <span>Inbox Pengajuan</span></div>
+                    <div id="nav-finance" onclick="showPage('finance')" class="nav-item">💰 <span>Laporan Gaji</span></div>
+                    <div id="nav-admin" onclick="showPage('admin')" class="nav-item">👥 <span>Database Anggota</span></div>
+                </div>
+            </nav>
+            <div onclick="location.reload()" class="nav-item" style="margin-top:auto; color: #fb7185;">🚪 <span>Keluar Sesi</span></div>
+        </aside>
+
+        <main class="main-content">
+            <div id="page-home" class="page-section">
+                <div id="duty-box" class="card" style="display: flex; justify-content: space-between; align-items: center; border-left: 8px solid var(--accent);">
+                    <div>
+                        <h2 id="welcome-user" style="font-size: 1.8rem;">Halo, Komandan!</h2>
+                        <div id="status-desc" style="margin-top: 8px;"></div>
+                    </div>
+                    <button id="btn-duty-toggle" class="btn btn-blue" style="min-width: 240px; height: 60px;">MULAI TUGAS</button>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">🚨 Personel Aktif <span id="active-count" class="badge badge-success">0</span></h3>
+                    <div id="active-duty-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;"></div>
+                </div>
+            </div>
+
+            <div id="page-submission" class="page-section" style="display:none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div class="card">
+                        <h3>Form Pengajuan Surat</h3>
+                        <select id="sub-type"><option value="Izin / Sakit">Izin / Sakit</option><option value="Cuti">Cuti</option><option value="Resign">Resign</option></select>
+                        <textarea id="sub-reason" rows="6" placeholder="Alasan lengkap..."></textarea>
+                        <button id="send-sub-btn" class="btn btn-blue" style="width:100%;">Kirim Pengajuan</button>
+                    </div>
+                    <div class="card"><h3>Riwayat Anda</h3><div id="user-history-list"></div></div>
+                </div>
+            </div>
+
+            <div id="page-inbox" class="page-section" style="display:none;">
+                <div class="card"><h3>📥 Inbox Pengajuan</h3><div id="inbox-content" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-top:20px;"></div></div>
+            </div>
+
+            <div id="page-finance" class="page-section" style="display:none;">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+                        <h3>💰 Rekapitulasi Gaji</h3>
+                        <div style="display:flex; gap:12px;">
+                            <button id="reset-fin-btn" class="btn btn-danger">Reset Menit</button>
+                            <button onclick="exportToWord()" class="btn btn-success">Export ke Word</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Nama Personel</th><th>Jabatan</th><th>Tarif/Min</th><th>Total Menit</th><th style="text-align:right;">Total Gaji</th></tr></thead>
+                            <tbody id="fin-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-admin" class="page-section" style="display:none;">
+                <div class="card">
+                    <h3>Tambah Anggota</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top:15px;">
+                        <input type="text" id="reg-nip" placeholder="NIP/ID">
+                        <input type="text" id="reg-name" placeholder="Nama">
+                        <input type="text" id="reg-rank" placeholder="Pangkat">
+                        <input type="number" id="reg-rate" placeholder="Gaji/Min">
+                    </div>
+                    <button id="reg-btn" class="btn btn-blue">Daftarkan</button>
+                </div>
+                <div class="card">
+                    <h3>Master Data</h3>
+                    <div class="table-container"><table><thead><tr><th>NIP</th><th>Nama</th><th>Pangkat</th><th style="text-align:right;">Aksi</th></tr></thead><tbody id="emp-list"></tbody></table></div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYGY_o_slwFAvUBgL9YHl0heVI2CuN3wc",
+            authDomain: "kepolisian-sdp.firebaseapp.com",
+            projectId: "kepolisian-sdp",
+            storageBucket: "kepolisian-sdp.firebasestorage.app",
+            messagingSenderId: "500563443117",
+            appId: "1:500563443117:web:e1702bd08ee47eaa42f524",
+            databaseURL: "https://kepolisian-sdp-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const rootPath = 'sipol_sdp_v1';
+        let sessionUser = null;
+        let globalData = { members: {}, inbox: {} };
+
+        // LOGIC AUTH & SYNC
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const nip = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+            if(nip.toLowerCase()==='admin' && pass==='321'){ sessionUser={name:'Administrator', role:'admin', nip:'ADMIN', rank:'High Command'}; initDashboard(); }
+            else {
+                const member = Object.values(globalData.members).find(m => m.nip === nip);
+                if(member){ sessionUser={...member, role:'user'}; initDashboard(); }
+                else alert("NIP tidak terdaftar!");
+            }
+        };
+
+        function initDashboard() {
+            document.getElementById('main-body').classList.add('logged-in');
+            document.getElementById('login-section').style.display='none';
+            document.getElementById('dashboard-section').style.display='block';
+            document.getElementById('user-name-sidebar').innerText = sessionUser.name;
+            document.getElementById('user-rank-sidebar').innerText = sessionUser.rank;
+            document.getElementById('admin-tools').style.display = sessionUser.role==='admin'?'block':'none';
+            document.getElementById('user-tools').style.display = sessionUser.role==='admin'?'none':'block';
+            document.getElementById('duty-box').style.display = sessionUser.role==='admin'?'none':'flex';
+            showPage('home');
+        }
+
+        window.showPage = (id) => {
+            document.querySelectorAll('.page-section').forEach(p=>p.style.display='none');
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+            document.getElementById('page-'+id).style.display='block';
+            document.getElementById('nav-'+id).classList.add('active');
+            render();
+        };
+
+        onValue(ref(database, rootPath), (snap) => {
+            const data = snap.val(); if(data){ globalData.members=data.members||{}; globalData.inbox=data.inbox||{}; render(); }
+        });
+
+        function render() {
+            if(!sessionUser) return;
+            const members = Object.values(globalData.members);
+            const activeOnes = members.filter(m => m.isDuty);
+            document.getElementById('active-count').innerText = activeOnes.length;
+            document.getElementById('active-duty-list').innerHTML = activeOnes.map(u => `<div style="padding:15px; background:white; border-radius:15px; border-left:5px solid var(--success); display:flex; align-items:center; gap:10px;"><b>${u.name}</b> <span style="font-size:0.7rem;">${u.rank}</span></div>`).join('');
+
+            if(sessionUser.role!=='admin') {
+                const me = members.find(m => m.nip === sessionUser.nip);
+                if(me) {
+                    document.getElementById('welcome-user').innerText = `Halo, ${me.name}!`;
+                    document.getElementById('status-desc').innerHTML = me.isDuty ? `<span class="badge badge-success">On Duty</span>` : `<span class="badge badge-danger">Off Duty</span>`;
+                    document.getElementById('btn-duty-toggle').innerText = me.isDuty ? "AKHIRI TUGAS" : "MULAI TUGAS";
+                    document.getElementById('btn-duty-toggle').className = me.isDuty ? "btn btn-danger" : "btn btn-blue";
+                    document.getElementById('btn-duty-toggle').onclick = () => {
+                        const k = Object.keys(globalData.members).find(key => globalData.members[key].nip === me.nip);
+                        if(!me.isDuty) update(ref(database, `${rootPath}/members/${k}`), { isDuty:true, lastIn: Date.now() });
+                        else {
+                            const diff = Math.floor((Date.now()-me.lastIn)/60000);
+                            update(ref(database, `${rootPath}/members/${k}`), { isDuty:false, totalDuty: (me.totalDuty||0)+(diff>0?diff:1) });
+                        }
+                    };
+                }
+                document.getElementById('user-history-list').innerHTML = Object.entries(globalData.inbox).filter(([k,v])=>v.senderNip===sessionUser.nip).reverse().map(([k,v])=>`<div style="background:white; padding:15px; border-radius:15px; margin-top:10px; border:1px solid #eee;"><b>${v.type}</b> <span class="badge ${v.status==='Diterima'?'badge-success':(v.status==='Ditolak'?'badge-danger':'badge-warning')}">${v.status}</span><p style="font-size:0.8rem; margin-top:5px;">${v.content}</p></div>`).join('');
+            } else {
+                document.getElementById('inbox-content').innerHTML = Object.entries(globalData.inbox).filter(([k,v])=>v.status==='Menunggu').map(([k,v])=>`<div class="card" style="margin-bottom:0; padding:20px;"><b>${v.sender}</b> (${v.rank})<div style="background:#f1f5f9; padding:10px; border-radius:10px; margin:10px 0; font-size:0.85rem;"><b>${v.type}</b>: ${v.content}</div><div style="display:flex; gap:10px;"><button onclick="window.pInbox('${k}','Diterima')" class="btn btn-success" style="flex:1;">Terima</button><button onclick="window.pInbox('${k}','Ditolak')" class="btn btn-danger" style="flex:1;">Tolak</button></div></div>`).join('');
+                document.getElementById('fin-list').innerHTML = members.map(m => `<tr><td><b>${m.name}</b></td><td>${m.rank}</td><td>Rp ${m.rate.toLocaleString()}</td><td>${m.totalDuty||0} Min</td><td style="text-align:right; font-weight:900; color:var(--success);">Rp ${((m.totalDuty||0)*m.rate).toLocaleString('id-ID')}</td></tr>`).join('');
+                document.getElementById('emp-list').innerHTML = Object.entries(globalData.members).map(([k,m])=>`<tr><td><code>${m.nip}</code></td><td><b>${m.name}</b></td><td>${m.rank}</td><td style="text-align:right;"><button onclick="window.delMem('${k}')" style="color:var(--danger); background:none; border:none; cursor:pointer; font-weight:bold;">HAPUS</button></td></tr>`).join('');
+            }
+        }
+
+        window.pInbox = (k,s) => update(ref(database, `${rootPath}/inbox/${k}`), {status:s});
+        window.delMem = (k) => confirm("Hapus anggota?") && remove(ref(database, `${rootPath}/members/${k}`));
+        document.getElementById('reg-btn').onclick = () => {
+            const nip=document.getElementById('reg-nip').value, name=document.getElementById('reg-name').value;
+            if(!nip || !name) return;
+            push(ref(database, `${rootPath}/members`), { nip, name, rank:document.getElementById('reg-rank').value, rate:parseInt(document.getElementById('reg-rate').value)||0, totalDuty:0, isDuty:false });
+            alert("Berhasil!");
+        };
+
+        document.getElementById('send-sub-btn').onclick = () => {
+            const content = document.getElementById('sub-reason').value; if(!content) return;
+            push(ref(database, `${rootPath}/inbox`), { senderNip:sessionUser.nip, sender:sessionUser.name, rank:sessionUser.rank, type:document.getElementById('sub-type').value, content, status:'Menunggu' });
+            document.getElementById('sub-reason').value=''; alert("Terkirim!");
+        };
+
+        document.getElementById('reset-fin-btn').onclick = () => {
+            if(confirm("Reset semua menit kerja?")) Object.keys(globalData.members).forEach(k => update(ref(database, `${rootPath}/members/${k}`), {totalDuty:0}));
+        };
+
+        // EXPORT COMPACT TABLE (HANYA INI YANG BERUBAH)
+        window.exportToWord = () => {
+            const date = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            let tableRows = Object.values(globalData.members).map(u => `
+                <tr style="border: 0.5pt solid #000;">
+                    <td style="padding: 4pt; border: 0.5pt solid #000; font-family: 'Arial'; font-size: 8.5pt; width: 140pt;">${u.name}</td>
+                    <td style="padding: 4pt; border: 0.5pt solid #000; font-family: 'Arial'; font-size: 8.5pt; width: 80pt;">${u.rank}</td>
+                    <td style="padding: 4pt; border: 0.5pt solid #000; font-family: 'Arial'; font-size: 8.5pt; text-align: center; width: 40pt;">${u.totalDuty || 0}</td>
+                    <td style="padding: 4pt; border: 0.5pt solid #000; font-family: 'Arial'; font-size: 8.5pt; text-align: right; width: 80pt;">Rp ${((u.totalDuty || 0) * u.rate).toLocaleString('id-ID')}</td>
+                </tr>
+            `).join('');
+
+            const header = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><style>
+                    @page { size: A4; margin: 1.5cm; }
+                    body { font-family: 'Arial'; }
+                    .title { text-align: center; font-size: 14pt; font-weight: bold; margin-bottom: 2pt; text-transform: uppercase; }
+                    .subtitle { text-align: center; font-size: 9pt; margin-bottom: 15pt; }
+                    table { border-collapse: collapse; width: auto; margin-left: auto; margin-right: auto; }
+                    th { background-color: #f2f2f2; padding: 5pt; border: 0.5pt solid #000; font-size: 9pt; font-weight: bold; text-align: center; }
+                </style></head>
+                <body>
+                    <div class="title">LAPORAN PENGGAJIAN PERSONEL</div>
+                    <div class="subtitle">SIPOL Sundapride Management - ${date}</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NAMA PERSONEL</th>
+                                <th>PANGKAT</th>
+                                <th>MENIT</th>
+                                <th>TOTAL GAJI</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                    <br>
+                    <div style="float: right; text-align: center; width: 150pt; font-size: 9pt;">
+                        <p>Tertanda,</p>
+                        <br><br><br>
+                        <p><b>High Command</b></p>
+                    </div>
+                </body></html>`;
+
+            const blob = new Blob(['\ufeff', header], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Rekap_Gaji_SDP_${new Date().getTime()}.doc`;
+            link.click();
+        };
+
+        setInterval(() => { if(sessionUser) render(); }, 15000);
+    </script>
+</body>
+</html>
